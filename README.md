@@ -89,6 +89,8 @@ Production microservices infrastructure running **75+ Docker containers** across
 | [iolaus-zeus](https://github.com/HeraclesBass/iolaus-zeus) | Dual-interface AI platform (CLI + web) | TypeScript, React, Python, FastAPI |
 | [claude-gemini](https://github.com/HeraclesBass/claude-gemini) | CLI bridge for Gemini 3.1 Pro reasoning | Python, Google GenAI SDK |
 | [claude-pi](https://github.com/HeraclesBass/claude-pi) | Co-processor CLI for Pi agent framework | TypeScript, Node.js, Commander.js |
+| [athenaeum](https://github.com/HeraclesBass/athenaeum) | Self-hosted semantic library platform (RAG) | Python, FastAPI, pgvector, Next.js |
+| [observability-showcase](https://github.com/HeraclesBass/observability-showcase) | Production observability stack | Grafana, Prometheus, Loki, OpenTelemetry |
 | [ckreynolds-tax-showcase](https://github.com/HeraclesBass/ckreynolds-tax-showcase) | Tax service SaaS platform (client project) | Next.js, TypeScript, Supabase, Square, Twilio |
 
 ---
