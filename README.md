@@ -1,6 +1,6 @@
 # Hercules Platform
 
-Production microservices infrastructure running **70 Docker containers** across **31 projects** with event-driven architecture, AI agent orchestration, and full observability.
+Production microservices infrastructure running **75+ Docker containers** across **35 projects** with event-driven architecture, AI agent orchestration, and full observability.
 
 **Live at [herakles.dev](https://herakles.dev)** | [hello@herakles.dev](mailto:hello@herakles.dev)
 
@@ -9,7 +9,7 @@ Production microservices infrastructure running **70 Docker containers** across 
 ```
                         +---------------+
                         |    nginx      |  SSL termination, rate limiting
-                        |   gateway     |  routing to 31+ projects
+                        |   gateway     |  routing to 35+ projects
                         +-------+-------+
                                 |
               +-----------------+-----------------+
@@ -34,7 +34,7 @@ Production microservices infrastructure running **70 Docker containers** across 
   +-------------------------------------------------------------
 ```
 
-## Services (31 projects, 70 containers)
+## Services (35 projects, 75+ containers)
 
 | Category | Count | Examples |
 |----------|-------|---------|
@@ -46,21 +46,21 @@ Production microservices infrastructure running **70 Docker containers** across 
 
 ## Key Capabilities
 
-- **[AI Agent Orchestration](https://github.com/HeraclesBass/claude-orchestrator-showcase)**: 103 specialized agents coordinated by meta-orchestrator with wave-based parallel execution, 48 skills, 12 lifecycle hooks ([architecture showcase](https://github.com/HeraclesBass/claude-orchestrator-showcase))
+- **[AI Agent Orchestration](https://github.com/HeraclesBass/claude-orchestrator-showcase)**: 104 specialized agents coordinated by meta-orchestrator with wave-based parallel execution, 51 skills, 11 lifecycle hooks ([architecture showcase](https://github.com/HeraclesBass/claude-orchestrator-showcase))
 - **Event-Driven Communication**: Redis pub/sub and WebSocket for real-time inter-service messaging
 - **Multi-Tenant Auth**: SSO with MFA and role-based access control
 - **Zero-Downtime Deployment**: Automated builds, health checks, rollback capability via Docker Compose
 - **Full Observability**: Grafana dashboards per service, Loki log aggregation, Prometheus metrics scraping, automated alerting
-- **66 Live Domains**: SSL-terminated nginx reverse proxy with rate limiting zones
+- **70 Live Domains**: SSL-terminated nginx reverse proxy with rate limiting zones
 
 ## Tech Stack
 
 | Layer | Technologies |
 |-------|-------------|
 | **Languages** | Python, TypeScript, JavaScript, Go, Bash, SQL |
-| **Frontend** | React, Next.js 14, Tailwind CSS, Three.js |
+| **Frontend** | React, Next.js, Tailwind CSS, Three.js |
 | **Backend** | Node.js, Flask, Express, FastAPI, WebSocket |
-| **AI/ML** | Gemini 2.5 Pro, Claude API, OpenAI, Ollama |
+| **AI/ML** | Gemini 3.1 Pro, Claude Opus 4.6, Ollama |
 | **Databases** | PostgreSQL, Redis, MongoDB, SQLite |
 | **Infrastructure** | Docker, Linux, reverse proxy, container orchestration |
 | **Observability** | Grafana, Prometheus, Loki, OpenTelemetry |
@@ -70,9 +70,9 @@ Production microservices infrastructure running **70 Docker containers** across 
 
 | Metric | Value |
 |--------|-------|
-| Running containers | 70+ |
-| Active projects | 30+ |
-| Live subdomains | 60+ |
+| Running containers | 75+ |
+| Active projects | 35+ |
+| Live subdomains | 70+ |
 | Codebase | 400K+ LOC |
 | Database engines | PostgreSQL, Redis, MongoDB |
 | Uptime monitoring | Prometheus + Grafana alerting |
