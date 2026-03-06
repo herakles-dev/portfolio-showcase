@@ -113,3 +113,41 @@
 
   Effort: high
   Formation: feature-impl (if delegating to teammates)
+
+
+
+
+RESULT (26 minutes) 
+
+ Phase 1 Memory V2 — Complete                                                       
+                                                                                                                                 
+  All 5 waves implemented and verified:                                                                                          
+                                                                                    
+  ┌─────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────┬────────┐   
+  │          Wave           │                                         Tasks                                         │ Status │
+  ├─────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┼────────┤   
+  │ Wave 1 (Foundation)     │ Migration 019, gemini-flash.ts, scheduler.ts                                          │ ✅     │    
+  ├─────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┼────────┤   
+  │ Wave 2 (Lifecycle)      │ Lifecycle filters, deprecate/supersede tools, circuit breaker                         │ ✅     │    
+  ├─────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┼────────┤   
+  │ Wave 3 (Contradictions) │ Migration 020, contradictions.ts, historical/timeline/provenance, context.ts/learn.ts │ ✅     │    
+  ├─────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┼────────┤   
+  │ Wave 4 (Working Memory) │ Snapshot persist/restore, pool sizing                                                 │ ✅     │    
+  ├─────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┼────────┤   
+  │ Wave 5 (Polish)         │ GEMINI.md, unregister cache tools, scheduler HUD, tests                               │ ✅     │    
+  └─────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────┴────────┘
+
+  Final verification
+
+  - TypeScript: npx tsc --noEmit — zero errors
+  - Tests: npx vitest run — 6 files, 41 tests, all green
+  - Production DB: Migrations 019 + 020 applied, contradiction tables fixed (UUID→TEXT)
+  - Tool count: 170 → 161 (19 cache tools removed, 10 new tools added)
+
+  Fixes applied during testing
+
+  - Created halp_cognitive_brain_test database with pgvector
+  - Added dotenv loading to test helper (tests/helpers/db.ts)
+  - Fixed generateTestUserId padding for valid UUIDs
+  - Changed contradiction table columns from UUID to TEXT (memory tables use integer PKs)
+  - Set fileParallelism: false in vitest config to prevent DB test races
