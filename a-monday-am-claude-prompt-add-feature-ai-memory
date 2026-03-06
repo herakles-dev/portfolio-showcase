@@ -1,0 +1,115 @@
+ # Memory V2 Phase 1: Lifecycle, Contradictions, HNSW, Working Memory                                                                                                                    
+
+  ## V11 Protocol
+  Read: /home/hercules/v11/CLAUDE.md
+
+  ## Project Context
+  Read these files IN ORDER:
+  1. ~/CLAUDE.md
+  2. ~/planning/MEMORY_V2_SPEC.md (lines 646-718 = Phase 1)
+  3. ~/brain/extensions/hal/src/memory.ts
+  4. ~/brain/extensions/hal/src/working.ts
+  5. ~/brain/extensions/hal/src/utils/db.ts
+  6. ~/brain/extensions/hal/src/utils/embedding.ts
+  7. ~/brain/extensions/hal/src/utils/redis.ts
+  8. ~/brain/extensions/hal/src/context.ts
+  9. ~/brain/extensions/hal/src/learn.ts
+  10. ~/brain/GEMINI.md
+  11. TaskList (check current V11 task state)
+
+  ## Session: iolaus-brain
+  State: ~/sessions/iolaus-brain/state.md
+  Spec: ~/sessions/iolaus-brain/spec.md
+
+  ## Goal
+  Implement Phase 1 of Memory V2 (33 tasks, spec tasks #9-37). Every memory gets a lifecycle.
+  Stale facts get deprecated. Contradictions are detected asynchronously via Gemini Flash.
+  Historical knowledge is preserved but separated. Session state survives crashes. Vector
+  searches use HNSW indexes.
+
+  ## Execution Order (Critical — respect dependencies)
+
+  ### Wave 1: Foundation (Tasks 9, 22, 18b) — PARALLEL
+  - **Task 9**: Migration 019 (lifecycle columns + working_snapshots) + 019c (HNSW indexes CONCURRENTLY). Create lazy migration runner `/opt/olympian/run_migrations.py`.
+  - **Task 22**: Create `utils/gemini-flash.ts` — Flash API client (gemini-2.0-flash, v1beta, raw fetch, OAuth chain from embedding.ts pattern, responseMimeType JSON). Export
+  `flashClassify<T>()` and `flashSummarize()`.
+  - **Task 18b**: Create `utils/scheduler.ts` — brain-local scheduler lifecycle. Exports `startSessionSchedulers(userId)` / `stopSessionSchedulers()`. Interval management, overlap guard,
+   SIGTERM cleanup.
+
+  ### Wave 2: Lifecycle + Flash Hardening (Tasks 10-14, 22b, 22c) — PARALLEL
+  - **Tasks 10-12**: Update `memory_search_*` — add `WHERE lifecycle_state = 'active'` default filter + optional `include_superseded` param. Rename `confidence` → `confidence_score` in
+  episodic.
+  - **Task 13**: New `memory_deprecate()` MCP tool
+  - **Task 14**: New `memory_supersede()` MCP tool
+  - **Task 22b**: Circuit breaker for gemini-flash.ts (3 failures → 5min backoff → 30min max)
+  - **Task 22c**: Tests for gemini-flash.ts
+
+  ### Wave 3: Contradictions + History (Tasks 15-21, 23-27) — PARALLEL
+  - **Tasks 15-21**: Migration 020 + full `contradictions.ts` module (scan_batch, resolve, list, auto-resolution, queue wiring in memory.ts)
+  - **Tasks 23-27**: Historical search, timeline, provenance, context.ts update, learn.ts queue wiring
+
+  ### Wave 4: Working Memory + Pool (Tasks 28-31) — PARALLEL
+  - **Tasks 28-29**: `working_persist_snapshot()` + `working_restore_snapshot()` in working.ts
+  - **Tasks 30-31**: Pool sizing (POOL_MAX env, idle timeout) + health monitoring in utils/db.ts
+
+  ### Wave 5: Polish + Tests (Tasks 32-37) — SEQUENTIAL then PARALLEL
+  - **Task 32**: GEMINI.md update + unregister 20 cache_* tools from MCP
+  - **Task 32b**: Scheduler health in system_status HUD
+  - **Task 33**: Accuracy baseline setup
+  - **Tasks 34-37**: Unit + integration tests (scoring, lifecycle, contradictions, working memory)
+
+  ## Autonomy: A2
+  Auto-approve edits to:
+  - `brain/extensions/hal/src/**`
+  - `brain/extensions/hal/tests/**`
+  - `dispatcher/migrations/**`
+  - `brain/GEMINI.md`
+  - `server_v3/api/system_status.py`
+
+  Confirm before: production container restarts, Packer builds, secrets changes.
+
+  ## V11 Task Protocol (MANDATORY)
+  - TaskCreate for each task BEFORE starting work (use spec task numbers as reference)
+  - TaskUpdate(status="in_progress") BEFORE editing files
+  - TaskUpdate(status="completed") AFTER verifying each task
+  - Log blockers via TaskUpdate description
+  - Wave transitions: verify all wave tasks completed before advancing
+
+  ## Architecture Constraints
+  - **Auth chain**: OAuth → GEMINI_API_KEY → ~/.gemini/.env (match utils/embedding.ts)
+  - **DB pool**: Use shared `getPool()` from utils/db.ts (NEVER new Pool())
+  - **Redis**: Use shared `getRedis()` from utils/redis.ts (NEVER new Redis())
+  - **Embeddings**: Use shared `generateEmbedding()` from utils/embedding.ts
+  - **Embeddings**: Use shared `generateEmbedding()` from utils/embedding.ts
+  - **MCP tools**: Register new tools in tool-registry.ts with proper Zod schemas (use z.any() NOT z.unknown())
+  - **ESM**: All imports use `.js` extension (TypeScript ESM)
+  - **No circular deps**: Task 16 specifically warns — use raw SQL in memory.ts, don't import contradictions.ts
+  - **Exit handlers**: Only utils/db.ts and utils/redis.ts own process cleanup
+  - **Migrations**: Number from 019 (next available). Run on dev DB port 5434.
+
+  ## Dev Environment
+  - Dev container: `iolaus-brain-dev` on port 8092 (hot-reload)
+  - Start: `source ~/.secrets/hercules.env && docker compose -f docker-compose.dev.yml up -d`
+  - Test: `cd brain/extensions/hal && npx vitest run`
+  - Build check: `cd brain/extensions/hal && npx tsc --noEmit`
+  - DB: `halp_cognitive_brain` on port 5434, test DB: `halp_cognitive_brain_test`
+
+  ## Verification (per wave)
+  - TypeScript compiles: `npx tsc --noEmit` (zero errors)
+  - Tests pass: `npx vitest run` (all green)
+  - New MCP tools register: check tool-registry.ts exports
+  - Migrations run clean: test on dev DB first
+  - No regressions: existing embedding tests still pass
+
+  ## Deliverables
+  - 2 migrations (019 lifecycle + HNSW, 020 contradictions)
+  - 1 migration runner script
+  - 3 new utility modules (gemini-flash.ts, scheduler.ts, contradictions.ts)
+  - ~11 new MCP tools (deprecate, supersede, search_historical, get_timeline, get_provenance, contradiction_scan/resolve/list, wo
+  - Updated memory.ts, working.ts, context.ts, learn.ts, db.ts
+  - Updated GEMINI.md + tool-registry.ts
+  - 4 test files (scoring, lifecycle, contradictions, working memory)
+  - Updated system_status HUD
+
+  Effort: high
+  Formation: feature-impl (if delegating to teammates)
